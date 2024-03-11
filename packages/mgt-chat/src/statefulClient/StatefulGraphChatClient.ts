@@ -25,69 +25,69 @@ import {
 } from '@microsoft/mgt-element';
 import {
   AadUserConversationMember,
-  Chat,
-  ChatMessage,
-  ChatMessageAttachment,
-  ChatRenamedEventMessageDetail,
-  MembersAddedEventMessageDetail,
-  MembersDeletedEventMessageDetail,
-  ChatMessageMention,
-  NullableOption
+  chat,
+  chatmessage,
+  chatmessageattachment,
+  chatrenamedeventmessagedetail,
+  membersaddedeventmessagedetail,
+  membersdeletedeventmessagedetail,
+  chatmessagemention,
+  nullableoption
 } from '@microsoft/microsoft-graph-types';
 import { v4 as uuid } from 'uuid';
-import { currentUserId, currentUserName } from '../utils/currentUser';
+import { currentuserid, currentusername } from '../utils/currentuser';
 import { graph } from '../utils/graph';
-import { MessageCache } from './Caching/MessageCache';
-import { GraphConfig } from './GraphConfig';
-import { GraphNotificationClient } from './GraphNotificationClient';
-import { ThreadEventEmitter } from './ThreadEventEmitter';
+import { messagecache } from './caching/messagecache';
+import { graphconfig } from './graphconfig';
+import { graphnotificationclient } from './graphnotificationclient';
+import { threadeventemitter } from './threadeventemitter';
 import {
-  MessageCollection,
-  addChatMembers,
-  deleteChatMessage,
-  loadChat,
-  loadChatImage,
-  loadChatThread,
-  loadChatThreadDelta,
-  loadMoreChatMessages,
-  removeChatMember,
-  sendChatMessage,
-  updateChatMessage,
-  updateChatTopic
+  messagecollection,
+  addchatmembers,
+  deletechatmessage,
+  loadchat,
+  loadchatimage,
+  loadchatthread,
+  loadchatthreaddelta,
+  loadmorechatmessages,
+  removechatmember,
+  sendchatmessage,
+  updatechatmessage,
+  updatechattopic
 } from './graph.chat';
-import { updateMessageContentWithImage } from '../utils/updateMessageContentWithImage';
-import { GraphChatClientStatus, isChatMessage } from '../utils/types';
-import { rewriteEmojiContentToHTML } from '../utils/rewriteEmojiContent';
-import { buildBotId } from './buildBotId';
-import { BaseStatefulClient } from './BaseStatefulClient';
+import { updatemessagecontentwithimage } from '../utils/updatemessagecontentwithimage';
+import { graphchatclientstatus, ischatmessage } from '../utils/types';
+import { rewriteemojicontenttohtml } from '../utils/rewriteemojicontent';
+import { buildbotid } from './buildbotid';
+import { basestatefulclient } from './basestatefulclient';
 
-const hasUnsupportedContent = (content: string, attachments: ChatMessageAttachment[]): boolean => {
-  const unsupportedContentTypes = [
+const hasunsupportedcontent = (content: string, attachments: chatmessageattachment[]): boolean => {
+  const unsupportedcontenttypes = [
     'application/vnd.microsoft.card.codesnippet',
     'application/vnd.microsoft.card.fluid',
-    'application/vnd.microsoft.card.fluidEmbedCard',
+    'application/vnd.microsoft.card.fluidembedcard',
     'reference'
   ];
-  const isUnsupported: boolean[] = [];
+  const isunsupported: boolean[] = [];
 
   if (attachments.length) {
     for (const attachment of attachments) {
-      const contentType = attachment?.contentType ?? '';
-      isUnsupported.push(unsupportedContentTypes.includes(contentType));
+      const contenttype = attachment?.contenttype ?? '';
+      isunsupported.push(unsupportedcontenttypes.includes(contenttype));
     }
   } else {
     // checking content with <attachment> tags
-    const unsupportedContentRegex = /<\/?attachment>/gim;
-    const contentUnsupported = Boolean(content) && unsupportedContentRegex.test(content);
-    isUnsupported.push(contentUnsupported);
+    const unsupportedcontentregex = /<\/?attachment>/gim;
+    const contentunsupported = boolean(content) && unsupportedcontentregex.test(content);
+    isunsupported.push(contentunsupported);
   }
-  return isUnsupported.every(e => e === true);
+  return isunsupported.every(e => e === true);
 };
 
-const buildAcsMessage = (
-  graphMessage: ChatMessage,
-  currentUser: string,
-  messageId: string,
+const buildacsmessage = (
+  graphmessage: chatmessage,
+  currentuser: string,
+  messageid: string,
   content: string
 ): GraphChatMessage => {
   const senderId = graphMessage.from?.user?.id ?? buildBotId(graphMessage.from?.application) ?? undefined;
