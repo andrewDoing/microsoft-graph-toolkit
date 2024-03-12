@@ -25,6 +25,7 @@ import { GraphConfig } from './GraphConfig';
 import { SubscriptionsCache } from './Caching/SubscriptionCache';
 import { Timer } from '../utils/Timer';
 import { getOrGenerateGroupId } from './getOrGenerateGroupId';
+import { v4 as uuid } from 'uuid';
 
 export const appSettings = {
   defaultSubscriptionLifetimeInMinutes: 10,
@@ -57,6 +58,7 @@ const isMembershipNotification = (o: Notification<Entity>): o is Notification<Aa
   o.resource.includes('/members');
 
 export class GraphNotificationClient {
+  private readonly instanceId = uuid();
   private connection?: HubConnection = undefined;
   private wasConnected?: boolean | undefined;
   private renewalTimeout?: string;
