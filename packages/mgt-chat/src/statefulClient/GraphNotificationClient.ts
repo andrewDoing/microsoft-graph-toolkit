@@ -229,7 +229,7 @@ export class GraphNotificationClient {
 
   private readonly startRenewalTimer = () => {
     if (this.renewalTimeout) this.timer.clearTimeout(this.renewalTimeout);
-    this.renewalTimeout = this.timer.setTimeout(this.syncRenewalTimerWrapper, appSettings.renewalTimerInterval * 1000);
+    this.renewalTimeout = this.timer.setTimeout('renewal:' + this.instanceId, this.syncRenewalTimerWrapper, appSettings.renewalTimerInterval * 1000);
     log(`Start renewal timer . Id: ${this.renewalTimeout}`);
   };
 
@@ -261,7 +261,7 @@ export class GraphNotificationClient {
         break;
       }
     }
-    this.renewalTimeout = this.timer.setTimeout(this.syncRenewalTimerWrapper, appSettings.renewalTimerInterval * 1000);
+    this.renewalTimeout = this.timer.setTimeout('renewal:' + this.instanceId, this.syncRenewalTimerWrapper, appSettings.renewalTimerInterval * 1000);
   };
 
   public renewChatSubscriptions = async () => {
@@ -280,6 +280,7 @@ export class GraphNotificationClient {
     await Promise.all(awaits);
     if (!this.renewalTimeout) {
       this.renewalTimeout = this.timer.setTimeout(
+        'renewal:' + this.instanceId,
         this.syncRenewalTimerWrapper,
         appSettings.renewalTimerInterval * 1000
       );
@@ -342,7 +343,7 @@ export class GraphNotificationClient {
   }
 
   private startCleanupTimer() {
-    this.cleanupTimeout = this.timer.setTimeout(this.cleanupTimerSync, appSettings.removalTimerInterval * 1000);
+    this.cleanupTimeout = this.timer.setTimeout('renewal:' + this.instanceId, this.cleanupTimerSync, appSettings.removalTimerInterval * 1000);
   }
 
   private readonly cleanupTimerSync = () => {
